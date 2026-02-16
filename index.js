@@ -14,11 +14,12 @@ let db = { users: {} };
 if (fs.existsSync(DB_FILE)) db = JSON.parse(fs.readFileSync(DB_FILE));
 const saveDB = () => fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 
-// --- LANGUAGE DICTIONARY (HINDI, ENGLISH, BENGALI) ---
+// --- LANGUAGE DICTIONARY (HINDI, ENGLISH, MARATHI, BANGLA) ---
 const texts = {
-    hi: { title: "डिजिटल खाता", total: "कुल बाकी", add: "नया ग्राहक", name: "नाम", ph: "मोबाइल", bal: "बाकी", save: "सेव करें", jam: "जमा (-)", udh: "उधार (+)", search: "नाम खोजें...", msg: "व्हाट्सएप", late: "देरी" },
-    en: { title: "Digital Khata", total: "Total", add: "New Customer", name: "Name", ph: "Mobile", bal: "Balance", save: "SAVE", jam: "DEPOSIT", udh: "CREDIT", search: "Search...", msg: "WhatsApp", late: "LATE" },
-    bn: { title: "ডিজিটাল খাতা", total: "মোট বাকি", add: "নতুন গ্রাহক", name: "নাম", ph: "মোবাইল", bal: "বাকি", save: "সেভ করুন", jam: "জমা (-)", udh: "বাকি (+)", search: "খুঁজুন...", msg: "হোয়াটসঅ্যাপ", late: "দেরি" }
+    hi: { title: "डिजिटल खाता", total: "कुल बाकी", add: "जोड़ें" },
+    en: { title: "Digital Khata", total: "Total Balance", add: "Add Item" },
+    mr: { title: "डिजिटल खाते", total: "एकूण बाकी", add: "माल जोडा" }, // Marathi Added
+    bn: { title: "ডিজিটাল খাতা", total: "মোট বাকি", add: "যোগ করুন" }  // Bangla Kept
 };
 
 const checkAuth = (req, res, next) => {
@@ -36,11 +37,11 @@ app.get('/login', (req, res) => {
         .btn { width: 100%; background: #1a237e; color: white; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style></head>
     <body><div class="card">
-    <h2>Login / লগইন</h2>
+    <h2>Login / लॉग इन करें</h2>
     <form action="/login" method="POST">
         <input name="phone" type="number" placeholder="Mobile / মোবাইল" required>
         <input name="password" type="password" placeholder="Password / পাসওয়ার্ড" required>
-        <button class="btn">ENTER / প্রবেশ করুন</button>
+        <button class="btn">ENTER / प्रवेश करना</button>
     </form>
     <p>New? <a href="/signup">Create Account</a></p>
     </div></body></html>`);
