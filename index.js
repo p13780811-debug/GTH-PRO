@@ -129,51 +129,51 @@ app.get('/', checkAuth, (req, res) => {
     </body></html>`);
 });
 
-// --- NEW INVENTORY PAGE ---
+// --- UPDATED INVENTORY PAGE (With KG, Litre, Pkt) ---
 app.get('/inventory', checkAuth, (req, res) => {
     const userData = db.users[req.session.user];
     let invRows = (userData.inventory || []).map(i => `
-        <div style="display:flex; justify-content:space-between; background:white; padding:15px; border-radius:10px; margin-bottom:5px; border:1px solid #ddd;">
-            <b>${i.itemName}</b> <span>Qty: ${i.qty}</span>
+        <div style="display:flex; justify-content:space-between; background:white; padding:15px; border-radius:10px; margin-bottom:5px; border-left: 5px solid #ff9800; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <b style="font-size:18px;">${i.itemName}</b> 
+            <span style="font-weight:bold; color:#e65100; font-size:18px;">${i.qty} ${i.unit || 'Qty'}</span>
         </div>`).join('');
 
     res.send(`<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>body{font-family:sans-serif; background:#fff3e0; padding:15px;}</style></head>
+    <style>body{font-family:sans-serif; background:#fff3e0; padding:15px; margin:0;} .inp{width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #ccc; box-sizing:border-box; font-size:16px;}</style></head>
     <body>
-        <h2>📦 Inventory (Maal Stock)</h2>
-        <form action="/inventory/add" method="POST" style="background:white; padding:15px; border-radius:15px; margin-bottom:20px;">
-            <input name="itemName" placeholder="Maal ka naam" required style="width:90%; padding:12px; margin-bottom:10px;">
-            <input name="qty" type="number" placeholder="Quantity" required style="width:90%; padding:12px; margin-bottom:10px;">
-            <button style="width:100%; background:#ff9800; color:white; padding:15px; border:none; border-radius:10px; font-weight:bold;">ADD STOCK</button>
-        </form>
-        <div id="invList">${invRows}</div>
-        <br><a href="/" style="text-decoration:none; font-weight:bold; color:#1a237e;">← Back to Khata</a>
+        <div style="background:#ff9800; color:white; padding:20px; text-align:center; border-radius:0 0 20px 20px; margin-bottom:20px;">
+            <h2 style="margin:0;">📦 Maal Stock (Inventory)</h2>
+        </div>
+        <div style="padding:10px;">
+            <form action="/inventory/add" method="POST" style="background:white; padding:20px; border-radius:15px; margin-bottom:20px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                <input name="itemName" placeholder="Maal ka naam (e.g. Chini)" required class="inp">
+                <div style="display:flex; gap:10px;">
+                    <input name="qty" type="number" step="0.01" placeholder="Kitna?" required style="width:60%; padding:15px; border-radius:10px; border:1px solid #ccc; font-size:16px;">
+                    <select name="unit" style="width:38%; padding:15px; border-radius:10px; border:1px solid #ccc; background:white; font-size:16px; font-weight:bold;">
+                        <option value="KG">KG</option>
+                        <option value="Ltr">Litre</option>
+                        <option value="Pkt">Packet</option>
+                        <option value="Pcs">Pcs</option>
+                    </select>
+                </div>
+                <button style="width:100%; background:#ff9800; color:white; padding:18px; border:none; border-radius:10px; font-weight:bold; font-size:18px; margin-top:15px; cursor:pointer;">+ STOCK MEIN JODEIN</button>
+            </form>
+            <div id="invList">${invRows}</div>
+            <br><a href="/" style="display:block; text-align:center; text-decoration:none; font-weight:bold; color:#1a237e; padding:15px; border:2px solid #1a237e; border-radius:10px;">← Back to Dashboard</a>
+        </div>
     </body></html>`);
 });
 
 app.post('/inventory/add', checkAuth, (req, res) => {
     if(!db.users[req.session.user].inventory) db.users[req.session.user].inventory = [];
-    db.users[req.session.user].inventory.push({ itemName: req.body.itemName, qty: req.body.qty });
+    db.users[req.session.user].inventory.push({ 
+        itemName: req.body.itemName, 
+        qty: req.body.qty, 
+        unit: req.body.unit 
+    });
     saveDB(); res.redirect('/inventory');
 });
 
-app.post('/new', checkAuth, (req, res) => {
-    db.users[req.session.user].customers.push({ id: Date.now(), name: req.body.name, phone: req.body.phone, balance: parseInt(req.body.balance) || 0, lastDate: new Date() });
-    saveDB(); res.redirect('/');
-});
-
-app.post('/update', checkAuth, (req, res) => {
-    const { id, amount, action } = req.body;
-    const val = parseInt(amount) || 0;
-    db.users[req.session.user].customers = db.users[req.session.user].customers.map(c => {
-        if (c.id == id) {
-            c.balance = (action === 'add') ? c.balance + val : c.balance - val;
-            c.lastDate = new Date();
-        }
-        return c;
-    });
-    saveDB(); res.redirect('/');
-});
 
 app.get('/setlang/:l', checkAuth, (req, res) => { db.users[req.session.user].lang = req.params.l; saveDB(); res.redirect('/'); });
 app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/login'); });
